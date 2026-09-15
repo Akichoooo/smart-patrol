@@ -1,241 +1,161 @@
-![logo](doc/_media/logo.png)
-# 开箱即用的国标28181和部标808+1078协议视频平台
+﻿# 智能巡检监控平台 (Smart Patrol & Video Platform)
 
-[![Build Status](https://travis-ci.org/xia-chu/ZLMediaKit.svg?branch=master)](https://travis-ci.org/xia-chu/ZLMediaKit)
-[![license](http://img.shields.io/badge/license-MIT-green.svg)](https://github.com/xia-chu/ZLMediaKit/blob/master/LICENSE)
-[![JAVA](https://img.shields.io/badge/language-java-red.svg)](https://en.cppreference.com/)
-[![platform](https://img.shields.io/badge/platform-linux%20|%20macos%20|%20windows-blue.svg)](https://github.com/xia-chu/ZLMediaKit)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-yellow.svg)](https://github.com/xia-chu/ZLMediaKit/pulls)
+<p align="center">
+  <strong>新一代工业级多模态视觉AI · 智能巡检任务编排 · 多源音视频物联控制中枢</strong>
+</p>
 
+<p align="center">
+  <img src="https://img.shields.io/badge/Architecture-Spring%20Boot%203-brightgreen.svg" alt="Spring Boot" />
+  <img src="https://img.shields.io/badge/Frontend-React%2018%20%7C%20Semi%20UI-blue.svg" alt="React 18" />
+  <img src="https://img.shields.io/badge/AI%20Engine-YOLOv8%20%2B%20Multimodal%20VLM-orange.svg" alt="AI Engine" />
+  <img src="https://img.shields.io/badge/Protocols-ISAPI%20%7C%20GB28181%20%7C%20RTSP-purple.svg" alt="Protocols" />
+  <img src="https://img.shields.io/badge/License-Proprietary-red.svg" alt="License" />
+</p>
 
-WEB VIDEO PLATFORM是一个基于GB28181-2016、部标808、部标1078标准实现的开箱即用的网络视频平台，负责实现核心信令与设备管理后台部分，支持NAT穿透，支持海康、大华、宇视等品牌的IPC、NVR接入。支持国标级联，支持将不带国标功能的摄像机/直播流/直播推流转发到其他国标平台。
+---
 
-流媒体服务基于@夏楚 ZLMediaKit [https://github.com/ZLMediaKit/ZLMediaKit](https://github.com/ZLMediaKit/ZLMediaKit)   
-播放器使用@dexter jessibuca [https://github.com/langhuihui/jessibuca/tree/v3](https://github.com/langhuihui/jessibuca/tree/v3)  
-播放器使用@Numberwolf-Yanlong h265web.js [https://github.com/numberwolf/h265web.js](https://github.com/numberwolf/h265web.js)  
-前端页面基于vue-admin-template构建 [https://github.com/PanJiaChen/vue-admin-template?tab=readme-ov-file](https://github.com/PanJiaChen/vue-admin-template?tab=readme-ov-file)  
+## 📖 平台简介
 
-# 应用场景：
-- 支持浏览器无插件播放摄像头视频。
-- 支持国标设备(摄像机、平台、NVR等)设备接入
-- 支持rtsp, rtmp，直播设备设备接入，充分利旧。
-- 支持国标级联。多平台级联。跨网视频预览。
-- 支持跨网网闸平台互联。
+**智能巡检监控平台** 是自主研发的面向电力变电站、工业制造园区、新能源场站、石化生产及仓储物流场景的**企业级智能巡检与多源视频物联网调度管理系统**。
 
+平台彻底摆脱传统安防系统“只能看不能判”的局限，打造了“**高性能视频流汇聚分发 + 自动化巡检计划编排 + 边缘端小目标检测（YOLO）与大语言视觉模型（VLM）加权融合研判 + 工业硬件级直连控制（ISAPI / SDK）**”的全链路闭环中枢。
 
-# 文档
-wvp使用文档 [https://doc.wvp-pro.cn](https://doc.wvp-pro.cn)  
-ZLM使用文档 [https://github.com/ZLMediaKit/ZLMediaKit](https://github.com/ZLMediaKit/ZLMediaKit)
+---
 
-# gitee仓库
-https://gitee.com/pan648540858/wvp-GB28181-pro.git
+## 🌟 核心功能特性
 
-# 截图
-<table>
-    <tr>
-        <td ><center><img src="doc/_media/1.png" >登录页面 </center></td>
-        <td ><center><img src="doc/_media/2.png" >首页</center></td>
-    </tr>
-    <tr>
-        <td ><center><img src="doc/_media/3.png" >分屏播放 </center></td>
-        <td ><center><img src="doc/_media/4.png" >国标设备列表</center></td>
-    </tr>
-    <tr>
-        <td ><center><img src="doc/_media/5.png" >行政区划管理 </center></td>
-        <td ><center><img src="doc/_media/8.png" >业务分组管理</center></td>
-    </tr>
-    <tr>
-        <td ><center><img src="doc/_media/6.png" >录制计划</center></td>
-        <td ><center><img src="doc/_media/7.png" >平台信息</center></td>
-    </tr>
-</table>
+### 1. 🤖 边缘轻量初筛 + 云端大模型深度复核（多模态融合引擎）
+- **分级识别架构**：前端/边缘侧通过 YOLO 毫秒级快速检测人车、表计目标与异常入侵；复杂设备外观与语义研判由商汤 SenseNova、DeepSeek、GPT 等多模态视觉大模型（VLM）深度诊断。
+- **置信度自适应加权校准**：告别伪造的固定占位分，结合画面清晰度、目标遮挡比、多算法输出客观加权计算真实综合置信度。
+- **五大工业专属识别方案**：
+  - **表计指针与数显读数**（气压表、油位计、SF6 密度表等）；
+  - **设备指示灯状态判定**（运行绿灯、告警红灯、黄灯停机、频闪状态识别）；
+  - **断路器 / 空开状态识别**（分闸、合闸状态精准结构化解析）；
+  - **设备铭牌与工业字符 OCR**（微小字体、反光环境下序列号与关键读数）；
+  - **设备外观综合缺陷研判**（破损、油污渗漏、锈蚀、挂空异物、放电痕迹）。
 
-# 功能特性
-- [X] 集成web界面
-- [X] 兼容性良好
-- [X] 跨平台服务，一次编译多端部署， 可以同时用于x86和arm架构
-- [X] 国产环境适配，支持国产服务器部署，支持使用国产数据库，达梦、金仓。
-- [X] 接入设备
-  - [X] 视频预览
-  - [X] 支持主码流子码流切换
-  - [X] 无限制接入路数，能接入多少设备只取决于你的服务器性能
-  - [X] 云台控制，控制设备转向，拉近，拉远
-  - [X] 预置位查询，使用与设置
-  - [X] 查询NVR/IPC上的录像与播放，支持指定时间播放与下载
-  - [X] 无人观看自动断流，节省流量
-  - [X] 视频设备信息同步
-  - [X] 离在线监控
-  - [X] 支持直接输出RTSP、RTMP、HTTP-FLV、Websocket-FLV、HLS多种协议流地址
-  - [X] 支持通过一个流地址直接观看摄像头，无需登录以及调用任何接口
-  - [X] 支持UDP和TCP两种国标信令传输模式
-  - [X] 支持UDP和TCP两种国标流传输模式
-  - [X] 支持检索,通道筛选
-  - [X] 支持通道子目录查询
-  - [X] 支持过滤音频，防止杂音影响观看
-  - [X] 支持国标网络校时
-  - [X] 支持播放H264和H265
-  - [X] 报警信息处理，支持向前端推送报警信息
-  - [X] 语音对讲
-  - [X] 支持业务分组和行政区划树自定义展示以及级联推送
-  - [X] 支持订阅与通知方法
-    - [X] 移动位置订阅
-    - [X] 移动位置通知处理
-    - [X] 报警事件订阅
-    - [X] 报警事件通知处理
-    - [X] 设备目录订阅
-    - [X] 设备目录通知处理
-  -  [X] 移动位置查询和显示
-  - [X] 支持手动添加设备和给设备设置单独的密码
--  [X] 支持平台对接接入
--  [X] 支持国标级联
-  - [X] 国标通道向上级联
-    - [X] WEB添加上级平台
-    - [X] 注册
-    - [X] 心跳保活
-    - [X] 通道选择
-    - [X] 支持通道编号自定义, 支持每个平台使用不同的通道编号
-    - [X] 通道推送
-    - [X] 点播
-    - [X] 云台控制
-    - [X] 平台状态查询
-    - [X] 平台信息查询
-    - [X] 平台远程启动
-    - [X] 每个级联平台可自定义的虚拟目录
-    - [X] 目录订阅与通知
-    - [X] 录像查看与播放
-    - [X] GPS订阅与通知（直播推流）
-    - [X] 语音对讲
-  - [X] 支持同时级联到多个上级平台
-- [X] 支持自动配置ZLM媒体服务, 减少因配置问题所出现的问题;
-- [X] 支持流媒体节点集群，负载均衡。
-- [X] 支持启用udp多端口模式, 提高udp模式下媒体传输性能;
-- [X] 支持公网部署；
-- [X] 支持wvp与zlm分开部署，提升平台并发能力
-- [X] 支持拉流RTSP/RTMP，分发为各种流格式，或者推送到其他国标平台
-- [X] 支持推流RTSP/RTMP，分发为各种流格式，或者推送到其他国标平台
-- [X] 支持推流鉴权
-- [X] 支持接口鉴权
-- [X] 云端录像，推流/代理/国标视频均可以录制在云端服务器，支持预览和下载
-- [X] 支持打包可执行jar和war
-- [X] 支持跨域请求，支持前后端分离部署
-- [X] 支持Mysql，Postgresql，金仓等数据库
-- [X] 支持录制计划, 根据设定的时间对通道进行录制. 暂不支持将录制的内容转发到国标上级
-- [X] 支持国标信令集群
-- [X] 新增支持部标808和部标1078，大量新特性不一一列表了。支持作为网关被国标上级调用部标设备
-- [X] 支持电子地图。支持展示通道位置，支持在地图上修改通道位置。支持了数据分层抽稀数据能力，百万级数据也可以轻松展示。提供标准的矢量瓦片图层，常见地图引擎都可以直接展示。
-- [X] 借用zlm闭源版本新能力，可以支持录像保存至s3存储，支持minio。
-- [X] **全新虚拟线程支持，极大提升了平台的并发能力，局域网压测轻松接入五万+设备，这不是服务极限，这是我的压测工具和硬件测试服务器的极限，大家可自行测试。生产环境实际性能取决于服务器性能和网络带宽。**
-- [X] **支持报警订阅和报警管理，支持报警事件的展示和查询，支持报警时自动获取快照、播放录像。**
+### 2. 📋 全周期自动化巡视任务编排
+- **多终端多源采集**：统一纳管固定高清摄像机、云台球机、巡检机器人、无人机（UAV）及手持终端。
+- **多元巡视模式**：支持定时周期巡检、离线任务轮巡、单帧即时研判、历史视频切片回放复测。
+- **缺陷全闭环台账**：异常缺陷自动建档、三级风险（高/中/低）标记、告警免打扰策略、故障复归与人工双人复核审批。
 
-# 闭源内容
-  - [X] 支持开源所有功能
-  - [X] 支持国标28181-2022协议，已经过认证
-    - [X] 明确支持H265视频编码和AAC音频编码（开源已经支持）
-    - [X] 支持主辅码流切换（开源已经支持）
-    - [X] 支持GB18030编码格式，之前GB2312遇到未收录的字符经常有乱码。这个不会了
-    - [X] 支持图像抓拍，设备自行抓拍后上传到服务器，速度快省流量
-    - [X] PTZ 精准控制：包括控制，查询，订阅位置变化，支持精准设置云台的水平角度，垂直角度，变焦倍数
-    - [X] OSD配置
-    - [X] 视频画面遮挡配置
-    - [X] 支持巡航轨迹迹查询，巡航功能完善（（相当于开源基础上了多了回显））
-    - [X] 存储卡管理，支持状态查询，格式化
-    - [X] 设备升级
-    - [X] 支持目标跟踪，支持网页直接框选位置进行手动跟踪，也支持自动跟踪
-    - [X] 设备自带录像计划远程配置
-    - [X] 报警录像配置
-    - [X] 报警上报开关
-    - [X] 视频参数属性配置，支持对视频参数进行设置：包括编码格式，分辨率，帧率，码率，视频码率配置值(固定码率时必选)
-    - [X] 支持画面翻转控制，支持设置为基准画面，水平镜像（左右翻转），上下镜像（上下翻转）中心镜像（上下左右都翻转）
-    - [X] 支持看守位信息的查询（相当于开源基础上了多了回显）
-    - [X] 录像倒放，倒放拖动
-    - [X] 同时支持国标28181-2022与国标28181-2016双版本国标级联。可自行选择
-  - [X] ONVIF协议
-    - 自研协议实现，安全可靠。
-    - 设备检索
-    - 实时图像预览
-    - 录像回放、回放倍速控制
-    - 云台控制（八个方向）、预置位控制、绝对定位、看守位、聚焦控制
-    - 聚焦控制
-    - 设备重启
-    - 设备时间设置以及跟系统时间的差值比较
-    - 恢复出厂设置
-    - 自动获取设备品牌等信息、支持展示DNS信息、支持协议的展示
-    - 国标级联点播、自动点播等。
-  - [X] **海康-ISUP5.0/ISUP4.0/ISUP2.0/EHome**
-    - 设备注册
-    - 资源获取
-    - 预览
-    - 录像查询与回放
-    - 云台控制
-    - 预置位控制
-    - 报警，支持大量报警类型的解析与展示，
-      - 绊线检测
-      - 区域入侵
-      - 移动侦测
-      - 逆行检测
-      - 徘徊检测
-      - 人员聚集
-      - 声音异常
-      - 设备异常等。
-    - 抓图（设备直接上传快照图片到服务器，流量消耗低，无需服务端拉流解码）
-    - 对讲支持
-    - 设备配置（设备名称、循环录像等配置）
-    - 设备信息（设备序列号、类型等）
-    - 版本信息（软件、编码、面板、硬件的版本号）
-    - 编码配置（主辅码流分辨率、码率、帧率等配置）
-    - 图像参数配置（色调、对比度、亮度、饱和度配置）
-  - [X] 大华SDK
-    - 局域网设备发现
-    - 设备主动注册（用于服务器部署在公网时设备的注册）
-    - 通道获取
-    - 预览
-    - 录像回放
-    - 录像下载
-    - 云台控制，支持预置位控制、巡航组、巡迹、水平旋转、云台速度配置、开机动作、空闲动作、云台限位、定时任务、云台重启
-    - 抓图（设备直接上传快照图片到服务器，流量消耗低，无需服务端拉流解码）
-    - 喊话（单工）和对讲（双工）
-    - 相机配置，包括亮度、对比度、对比度、饱和度、色彩抑制、伽马、锐度、锐度抑制；视角的配置，提供正常、倒影、走廊模式、镜像的配置；曝光、背光、白平衡、日夜模式、数字变倍、聚焦、补光灯、透雾的配置
-    - 报警接收
-  - [ ] 国标35114协议（开发中...）
-  - [X] 国网B接口协议
-    - 设备注册
-    - 资源获取
-    - 预览
-    - 云台控制
-    - 预置位控制等，
-    - 可免费定制支持语音对讲、录像回放和抓拍图像。
-  - [X] 支持按权限分配可以使用的通道
-  - [X] 支持表格导出
-  - [X] 拉流代理支持按照品牌拼接url
-  - [X] 播放鉴权，给授权设备无法进行播放，拿到播放地址也不行
+### 3. 🔌 统一工业协议与硬件控制底座
+- **厂商原生 ISAPI 硬件直连**：原生对接海康威视、大华、宇视等主流 NVR/IPC，实现预置位召回、三维 PTZ 精确云台转动与焦距变倍。
+- **国家标准协议支撑**：全面支持 GB/T 28181-2016 标准协议接入、平台级联与跨网视频穿透。
+- **全格式流媒体分发**：支持 RTSP、RTMP、HLS、HTTP-FLV、WebRTC、WebSocket-FLV 全协议低延迟分发，浏览器免插件秒开。
 
+### 4. 🎨 现代化高质感控制台界面 (Web React 18)
+- **极致双皮肤自适应**：
+  - **深海蓝黑中枢模式**：专为工业控制大厅、调度中心打造，信息重点鲜明，降低暗光视觉疲劳；
+  - **科技明朗浅色模式**：专为日常巡视报表办公设计，卡片层级通透、对比清晰。
+- **工业标注级可视化交互**：
+  - 检出目标与左侧画面框悬停实时高亮联动；
+  - 表计读数实时提取与告警阈值比对；
+  - 大模型诊断原文解析与提示词透明查看。
 
-# 授权协议
-本项目自有代码使用宽松的MIT协议，在保留版权信息的情况下可以自由应用于各自商用、非商业的项目。 但是本项目也零碎的使用了一些其他的开源代码，在商用的情况下请自行替代或剔除； 由于使用本项目而产生的商业纠纷或侵权行为一概与本项目及开发者无关，请自行承担法律风险。 在使用本项目代码时，也应该在授权协议中同时表明本项目依赖的第三方库的协议
+### 5. 🔒 企业级安全、权限与审计体系
+- **三层权限控制**：模块功能权限、URI 路径拦截与机构/通道级细粒度数据范围（Data Scope）隔离。
+- **AOP 全链路审计**：操作日志、巡检结果审核轨迹、登录审计全量留痕。
+- **安全加固**：JWT 会话滑动续签、密码高强度哈希、防止垂直与水平越权。
 
-# 技术支持
+---
 
-## 官方公众号
-<img src="doc/_media/gongzhonghao.jpg" width="40%" height="40%">
+## 🏗️ 系统技术架构
 
-> 为大家提供WVP最新的开发进展，未来规划等内容。欢迎关注。
+`	ext
+┌────────────────────────────────────────────────────────────────────────┐
+│                        前端展现层 (Web React 18)                        │
+│  实时监控宫格 │ PTZ云台控制 │ 巡检结果台账 │ 离线任务编排 │ 统计分析大屏  │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │ HTTP / WebSocket
+┌───────────────────────────────────▼────────────────────────────────────┐
+│                        核心中枢调度层 (Spring Boot)                     │
+│  ┌───────────────────────┐ ┌──────────────────────┐ ┌────────────────┐ │
+│  │ PatrolOrchestrator   │ │ CompositeAnalyzer    │ │ ProtocolAdapter│ │
+│  │ 巡视编排与执行调度    │ │ 多模态推理融合引擎   │ │ 硬件驱动与适配 │ │
+│  └───────────────────────┘ └──────────────────────┘ └────────────────┘ │
+│  ┌───────────────────────────────────────────────────────────────────┐ │
+│  │ 企业级安全中枢 (JWT / URI Perm / Audit Aspect / Data Scope Filter) │ │
+│  └───────────────────────────────────────────────────────────────────┘ │
+└─────────────────┬───────────────────────────────────────┬──────────────┘
+                  │                                       │
+┌─────────────────▼──────────────┐     ┌──────────────────▼──────────────┐
+│       AI 算法推理集群           │     │       多源硬件与流媒体底座       │
+│ • 边缘 YOLOv8 目标/字符检测    │     │ • 海康 / 大华 / 宇视 (ISAPI)    │
+│ • 多模态视觉大模型 (VLM 集群)  │     │ • 国标 GB28181 视频流汇聚       │
+│ • 工业知识库检索增强 (RAG)     │     │ • ZLMediaKit 高性能流媒体引擎   │
+└────────────────────────────────┘     └─────────────────────────────────┘
+`
 
-## 付费社群
-<img src="doc/_media/shequ.png" width="50%" height="50%">
+---
 
-> 付费社群即可以对作者提供支持，也可以为大家更加快速的解决问题，还为正式加入星球的用户提供了微信群。对星球内容不满意，三天之内退出支持自动退款。如果暂时无法加入，给项目点个星也是极大的鼓励。
+## 📁 工程目录结构
 
-[知识星球](https://t.zsxq.com/0d8VAD3Dm)专栏列表：
-- [WVP 部署安全加固指南：新手必看，防范攻击与漏洞](https://articles.zsxq.com/id_tv8wz4uubx2n.html)
+`	ext
+wvp-GB28181-pro/
+├── docker/                     # Docker 容器化部署配置（Compose / Nginx / YOLO）
+├── doc/                        # 系统设计方案、重构文档与接口规范
+├── scripts/                    # 运维与启动管理脚本（一键拉起平台/端口放行）
+├── 数据库/2.7.4/                # 平台核心库初始化 SQL 与巡检扩展表结构
+│   ├── 初始化-mysql-2.7.4.sql
+│   ├── patrol-初始化.sql
+│   └── patrol-升级.sql
+├── src/main/java/              # 后端核心源码
+│   └── com/genersoft/iot/vmp/
+│       ├── patrol/             # 自研智能巡检模块（三层架构设计）
+│       │   ├── adapter/        # 工业协议适配器（ISAPI / 通用HTTP）
+│       │   ├── bean/           # 巡检领域枚举与强类型实体
+│       │   ├── controller/     # 巡检业务 REST 控制器
+│       │   ├── dao/            # MyBatis 持久化层
+│       │   ├── inference/      # YOLO客户端与VLM多模态融合推理机
+│       │   ├── orchestrator/   # 巡检任务编排器与状态机
+│       │   ├── security/       # 审计切面、数据权限与鉴权拦截器
+│       │   └── service/        # 巡视任务与结果核心业务逻辑
+│       └── gb28181/            # 国标信令与设备接入模块
+├── web-react/                  # 全新 React 18 + Semi UI 现代化前端工程
+│   ├── src/pages/monitor/      # 视频监控、机器人/无人机协同、录像回放
+│   ├── src/pages/patrol/       # 巡检任务管理、台账明细、告警中心、统计报表
+│   ├── src/pages/settings/     # 资产台账、AI模型管理、算法方案、机构权限
+│   └── src/styles/global.css   # 深浅双主题与高质感工业设计样式
+└── yolo_service.py             # 边缘轻量化 YOLO 推理微服务
+`
 
-有偿技术支持，一对一开发辅导，闭源内容合作请发送邮件到648540858@qq.com咨询
+---
 
-# 致谢
-感谢作者[夏楚](https://github.com/xia-chu) 提供这么棒的开源流媒体服务框架,并在开发过程中给予支持与帮助。     
-感谢作者[dexter langhuihui](https://github.com/langhuihui)和[Numberwolf-Yanlong](https://github.com/numberwolf/h265web.js) 开源这么好用的WEB播放器。      
-感谢各位大佬的赞助以及对项目的指正与帮助。包括但不限于代码贡献、问题反馈、资金捐赠等各种方式的支持！以下排名不分先后：  
-[lawrencehj](https://github.com/lawrencehj) [Smallwhitepig](https://github.com/Smallwhitepig) [swwhaha](https://github.com/swwheihei)
-[hotcoffie](https://github.com/hotcoffie) [xiaomu](https://github.com/nikmu) [TristingChen](https://github.com/TristingChen)
-[chenparty](https://github.com/chenparty) [Hotleave](https://github.com/hotleave) [ydwxb](https://github.com/ydwxb)
-[ydpd](https://github.com/ydpd) [szy833](https://github.com/szy833) [ydwxb](https://github.com/ydwxb) [Albertzhu666](https://github.com/Albertzhu666)
-[mk1990](https://github.com/mk1990) [SaltFish001](https://github.com/SaltFish001)
+## 🚀 快速开始与部署指南
+
+### 环境准备
+- **Java**: JDK 17+
+- **Node.js**: v18+ / npm 9+
+- **Docker & Docker Compose**: 20.10+
+- **Python**: 3.10+ (边缘 YOLO 服务可选)
+
+### 1. 启动基础支撑与流媒体服务
+`ash
+cd docker
+docker compose up -d polaris-mysql polaris-redis polaris-media polaris-nginx yolo-service
+`
+
+### 2. 数据库初始化
+平台数据库脚本位于 数据库/2.7.4/：
+1. 导入基础库结构：初始化-mysql-2.7.4.sql
+2. 导入智能巡检系统表：patrol-初始化.sql
+
+### 3. 构建前端工程
+`ash
+cd web-react
+npm install
+npm run build
+`
+
+### 4. 运行后端服务
+`ash
+mvn clean package -DskipTests
+java -jar target/wvp-pro-2.7.4-*.jar --spring.config.location=src/main/resources/application.yml
+`
+
+---
+
+## 🛡️ 版权与自主知识产权声明
+
+本项目为**自研智能巡检监控平台（Smart Patrol Platform）**企业级工程，享有完整自主知识产权。未经授权，禁止用于任何第三方未经许可的商业分发与转售。
