@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>智能巡检平台</title>
+    <script type="text/javascript" src="/static/js/jessibuca/jessibuca.js"></script>
+    <style>
+      html, body, #root { height: 100%; margin: 0; padding: 0; }
+      body { background: #0d1219; }
+      #app-loading {
+        position: fixed; inset: 0; display: flex; flex-direction: column;
+        align-items: center; justify-content: center; color: #4e7cff; gap: 16px;
+        font-size: 15px; letter-spacing: 2px; background: #0d1219; z-index: 9999;
+      }
+      #app-loading .ring {
+        width: 42px; height: 42px; border-radius: 50%;
+        border: 3px solid rgba(78, 124, 255, 0.2);
+        border-top-color: #4e7cff; animation: spin 0.9s linear infinite;
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <div id="app-loading"><div class="ring"></div>智能巡检平台加载中</div>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

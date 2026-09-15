@@ -56,6 +56,9 @@ public class WebSecurityConfig {
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
+    @Autowired(required = false)
+    private com.genersoft.iot.vmp.patrol.security.UriPermInterceptor uriPermInterceptor;
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
@@ -97,6 +100,7 @@ public class WebSecurityConfig {
         defaultExcludes.add("/api/emit");
         defaultExcludes.add("/favicon.ico");
         defaultExcludes.add("/api/user/login");
+        defaultExcludes.add("/api/patrol/media/file/**");
         defaultExcludes.add("/index/hook/**");
         defaultExcludes.add("/api/device/query/snap/**");
         defaultExcludes.add("/index/hook/abl/**");

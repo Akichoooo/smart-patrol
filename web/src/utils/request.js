@@ -79,7 +79,16 @@ service.interceptors.response.use(
       if (!store.getters.showConfirmBoxForLoginLose) {
         return
       }
-      let data = error.response.data
+      const url = (error.config && error.config.url) ? error.config.url : ''
+      if (url.indexOf('/api/front-end/ptz') >= 0 || url.indexOf('/api/front-end/preset') >= 0) {
+        Message.warning({
+          message: '当前通道为 RTSP 拉流代理模式（仅传输音视频流），不支持云台控制。如需控制摄像头转动，请在摄像机后台配置国标 GB28181 接入。',
+          showClose: true,
+          duration: 5000
+        })
+        return Promise.reject(error)
+      }
+      let data = error.response && error.response.data
       if (data && data.msg) {
         Message.error({
           message: data.msg,

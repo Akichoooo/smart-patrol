@@ -41,7 +41,8 @@ public interface RegionMapper {
 
     @Select(" select dc.civil_code as civil_code " +
             " from wvp_device_channel dc " +
-            " where dc.civil_code not in " +
+            " where dc.civil_code is not null " +
+            " and dc.civil_code not in " +
             " (select device_id from wvp_common_region)")
     List<String> getUninitializedCivilCode();
 

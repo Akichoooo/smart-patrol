@@ -159,6 +159,7 @@ public class RegionServiceImpl implements IRegionService {
     public void syncFromChannel() {
         // 获取未初始化的行政区划节点
         List<String> civilCodeList = regionMapper.getUninitializedCivilCode();
+        civilCodeList.removeIf(c -> c == null || c.isBlank());
         if (civilCodeList.isEmpty()) {
             return;
         }

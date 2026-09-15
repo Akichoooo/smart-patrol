@@ -34,3 +34,30 @@ certificates
 /打包/
 /snap/
 /config/
+
+# 智能巡检重构 - 参考截图（本地素材，体积大，不入库）
+/doc/智能巡检重构/截图/
+
+# 智能巡检重构 - 测试密钥（含 API Key，严禁入库）
+/doc/智能巡检重构/测试环境-密钥与模型配置.md
+
+# 前端依赖与构建产物
+node_modules/
+**/node_modules/
+web-react/dist/
+web/dist/
+
+# 大模型权重文件（避免 Git LFS 或超限）
+*.pt
+*.onnx
+*.bin
+
+# 临时抓包、审计与调试日志
+.audit_tmp/
+.codegraph/
+*.jwk_tmp.json
+.jwk_tmp.json
+hk*.txt
+hc*.txt
+msc*.html
+

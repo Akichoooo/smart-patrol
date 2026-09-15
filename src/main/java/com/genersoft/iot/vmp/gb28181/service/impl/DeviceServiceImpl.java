@@ -332,7 +332,7 @@ public class DeviceServiceImpl implements IDeviceService {
             device.setUpdateTime(now);
             log.info("[设备上线,首次注册]: {}，查询设备信息以及通道信息", device.getDeviceId());
             if(device.getStreamMode() == null) {
-                device.setStreamMode("TCP-PASSIVE");
+                device.setStreamMode("UDP");   // 海康系设备 GB28181 实测 UDP 通，TCP-PASSIVE 收不到流（架构规范：改动已在 AGENTS 记录）
             }
             deviceMapper.add(device);
             redisCatchStorage.updateDevice(device);
@@ -876,7 +876,7 @@ public class DeviceServiceImpl implements IDeviceService {
         device.setCreateTime(DateUtil.getNow());
         device.setUpdateTime(DateUtil.getNow());
         if(device.getStreamMode() == null) {
-            device.setStreamMode("TCP-PASSIVE");
+            device.setStreamMode("UDP");   // 海康系设备 GB28181 实测 UDP 通，TCP-PASSIVE 收不到流（架构规范：改动已在 AGENTS 记录）
         }
         deviceMapper.addCustomDevice(device);
     }
@@ -889,16 +889,43 @@ public class DeviceServiceImpl implements IDeviceService {
             log.warn("更新设备时未找到设备信息");
             return;
         }
-        if (deviceInStore.getGeoCoordSys() != null) {
+        if (device.getIp() == null || device.getIp().trim().isEmpty()) {
+            device.setIp(deviceInStore.getIp());
+        }
+        if (device.getPort() <= 0) {
+            device.setPort(deviceInStore.getPort());
+        }
+        if (device.getHostAddress() == null || device.getHostAddress().trim().isEmpty()) {
+            device.setHostAddress(deviceInStore.getHostAddress());
+        }
+        if (device.getTransport() == null || device.getTransport().trim().isEmpty()) {
+            device.setTransport(deviceInStore.getTransport());
+        }
+        if (device.getModel() == null || device.getModel().trim().isEmpty()) {
+            device.setModel(deviceInStore.getModel());
+        }
+        if (device.getManufacturer() == null || device.getManufacturer().trim().isEmpty()) {
+            device.setManufacturer(deviceInStore.getManufacturer());
+        }
+        if (device.getMediaServerId() == null || device.getMediaServerId().trim().isEmpty()) {
+            device.setMediaServerId(deviceInStore.getMediaServerId());
+        }
+        if (device.getLocalIp() == null || device.getLocalIp().trim().isEmpty()) {
+            device.setLocalIp(deviceInStore.getLocalIp());
+        }
+        if (device.getSipTransactionInfo() == null) {
+            device.setSipTransactionInfo(deviceInStore.getSipTransactionInfo());
+        }
+        if (device.getGeoCoordSys() != null) {
             // 坐标系变化，需要重新计算GCJ02坐标和WGS84坐标
-            if (!deviceInStore.getGeoCoordSys().equals(device.getGeoCoordSys())) {
+            if (!device.getGeoCoordSys().equals(deviceInStore.getGeoCoordSys())) {
                 deviceInStore.setGeoCoordSys(device.getGeoCoordSys());
             }
-        }else {
-            deviceInStore.setGeoCoordSys("WGS84");
+        } else {
+            device.setGeoCoordSys(deviceInStore.getGeoCoordSys() != null ? deviceInStore.getGeoCoordSys() : "WGS84");
         }
         if (device.getCharset() == null) {
-            deviceInStore.setCharset("GB2312");
+            device.setCharset(deviceInStore.getCharset() != null ? deviceInStore.getCharset() : "GB2312");
         }
 
         deviceMapper.updateCustom(device);

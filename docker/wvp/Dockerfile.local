@@ -1,0 +1,15 @@
+﻿FROM ringcentral/jdk:21.0.9
+
+EXPOSE 18978/tcp
+EXPOSE 8116/tcp
+EXPOSE 8116/udp
+EXPOSE 8080/tcp
+
+RUN mkdir -p /opt/wvp
+WORKDIR /opt/wvp
+
+# 复制本地编译好的 jar 包（mvn package 产物，target 下唯一 wvp-pro-*.jar）
+COPY target/wvp-pro-*.jar /opt/wvp/wvp.jar
+COPY ./docker/wvp/wvp /opt/wvp
+
+ENTRYPOINT ["java", "-Xms512m", "-Xmx1024m", "-XX:+HeapDumpOnOutOfMemoryError", "-XX:HeapDumpPath=/opt/ylcx/", "-jar", "wvp.jar", "--spring.config.location=/opt/ylcx/wvp/application.yml"]

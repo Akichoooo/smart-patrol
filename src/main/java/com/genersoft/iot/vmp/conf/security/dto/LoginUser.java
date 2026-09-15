@@ -1,9 +1,11 @@
 package com.genersoft.iot.vmp.conf.security.dto;
 
+import com.genersoft.iot.vmp.patrol.security.PatrolAuthorityService;
 import com.genersoft.iot.vmp.storager.dao.dto.Role;
 import com.genersoft.iot.vmp.storager.dao.dto.User;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.CredentialsContainer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.SpringSecurityCoreVersion;
@@ -11,6 +13,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 public class LoginUser implements UserDetails, CredentialsContainer {
 
@@ -34,6 +38,13 @@ public class LoginUser implements UserDetails, CredentialsContainer {
      */
     private LocalDateTime loginTime;
 
+    /**
+     * 巡检平台权限聚合（模块+操作+摄像头功能级，Spring Security GrantedAuthority）
+     */
+    @Getter
+    @Setter
+    private transient List<GrantedAuthority> authorities;
+
     public LoginUser(User user, LocalDateTime loginTime) {
         this.user = user;
         this.loginTime = loginTime;
@@ -42,7 +53,15 @@ public class LoginUser implements UserDetails, CredentialsContainer {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        // 返回真实权限（RBAC）；未装配时返回空集合而非 null，避免 Spring Security NPE
+        return authorities == null ? Collections.emptyList() : authorities;
+    }
+
+    /** 登录成功后聚合角色权限（由 DefaultUserDetailsServiceImpl / 登录流程调用） */
+    public void loadAuthorities(@Autowired(required = false) PatrolAuthorityService authorityService, int roleId) {
+        if (authorityService != null) {
+            this.authorities = authorityService.loadAuthorities(roleId);
+        }
     }
 
     @Override

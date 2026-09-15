@@ -67,6 +67,30 @@ public class RoleController {
         }
     }
 
+    @PostMapping("/update")
+    @Operation(summary = "更新角色", security = @SecurityRequirement(name = JwtUtils.HEADER))
+    @Parameter(name = "id", description = "角色Id", required = true)
+    @Parameter(name = "name", description = "角色名", required = true)
+    @Parameter(name = "authority", description = "权限", required = false)
+    public void update(@RequestParam Integer id,
+                       @RequestParam String name,
+                       @RequestParam(required = false) String authority) {
+        int currenRoleId = SecurityUtils.getUserInfo().getRole().getId();
+        if (currenRoleId != 1) {
+            throw new ControllerException(ErrorCode.ERROR403);
+        }
+        Role role = new Role();
+        role.setId(id);
+        role.setName(name);
+        role.setAuthority(authority);
+        role.setUpdateTime(DateUtil.getNow());
+
+        int result = roleService.update(role);
+        if (result <= 0) {
+            throw new ControllerException(ErrorCode.ERROR100);
+        }
+    }
+
     @GetMapping("/all")
     @Operation(summary = "查询角色", security = @SecurityRequirement(name = JwtUtils.HEADER))
     public List<Role> all(){

@@ -149,7 +149,7 @@ export default {
     },
     treeNodeClickEvent: function(data) {
       if (data.leaf) {
-        this.$emit('clickEvent', data.id)
+        this.$emit('clickEvent', data.id, data)
       }
     },
     refresh: function(id) {

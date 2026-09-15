@@ -2,23 +2,37 @@ server {
 	listen 8080;
 	server_name localhost;
 
+	# 厂商代理上游改为运行时解析：启动瞬间 DNS 失败不再导致 nginx 退出
+	resolver 127.0.0.11 valid=30s ipv6=off;
+
+	# 巡检媒体回传(机器人/无人机照片可达数MB)，放开请求体上限
+	client_max_body_size 50m;
+
     location / {
 		root /opt/dist;
         index  index.html index.htm;
+        # SPA 深链回退（React Router BrowserRouter）
+        try_files $uri $uri/ /index.html;
     }
 	location /record_proxy/{
 		 proxy_set_header Host $http_host;
 		 proxy_set_header X-Real-IP $remote_addr;
 		 proxy_set_header REMOTE-HOST $remote_addr;
 		 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-		 proxy_pass http://polaris-wvp:18978/;
+		 proxy_pass http://host.docker.internal:18978/;
 	}
 	location  /api/ {
 		proxy_set_header Host $http_host;
 		proxy_set_header X-Real-IP $remote_addr;
 		proxy_set_header REMOTE-HOST $remote_addr;
 		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_pass http://polaris-wvp:18978;
+        proxy_pass http://host.docker.internal:18978;
+
+        # 巡检平台 WebSocket（任务进度/告警推送）
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_read_timeout 3600s;
 
 
         # 从环境变量获取原始主机地址（x.x.x.x）
@@ -49,7 +63,7 @@ server {
     # 将mediaserver/record转发到目标地址
     location /mediaserver/api/downloadFile {
         # 目标服务器地址
-        proxy_pass http://polaris-media:80/index/api/downloadFile;
+        proxy_pass http://polaris-media:8081/index/api/downloadFile;
         
         # 以下是常用的反向代理设置
         proxy_set_header Host $host;
@@ -63,10 +77,102 @@ server {
         proxy_read_timeout 300s;
     }
 
+    # 代理 ZLMediaKit 实时画面抓拍快照 (供 AI 视觉分析即时截取真实帧)
+    location /zlm_snap {
+        proxy_pass http://polaris-media:8081/index/api/getSnap;
+        proxy_set_header Host $host;
+        add_header Access-Control-Allow-Origin *;
+    }
+
+    # 代理各大云端 AI 大模型接口 (完全消除浏览器 CORS 与 OPTIONS 预检 404 限制)
+    location /sensenova_proxy/ {
+        set $up_token https://token.sensenova.cn;
+        rewrite ^/sensenova_proxy/(.*)$ $1 break;
+        proxy_pass $up_token;
+        proxy_ssl_server_name on;
+        proxy_set_header Host token.sensenova.cn;
+        proxy_connect_timeout 60s;
+        proxy_read_timeout 300s;
+        proxy_send_timeout 60s;
+    }
+
+    location /dashscope_proxy/ {
+        set $up_dashscope https://dashscope.aliyuncs.com;
+        rewrite ^/dashscope_proxy/(.*)$ $1 break;
+        proxy_pass $up_dashscope;
+        proxy_ssl_server_name on;
+        proxy_set_header Host dashscope.aliyuncs.com;
+        proxy_connect_timeout 60s;
+        proxy_read_timeout 300s;
+        proxy_send_timeout 60s;
+    }
+
+    location /zhipu_proxy/ {
+        set $up_open https://open.bigmodel.cn;
+        rewrite ^/zhipu_proxy/(.*)$ $1 break;
+        proxy_pass $up_open;
+        proxy_ssl_server_name on;
+        proxy_set_header Host open.bigmodel.cn;
+        proxy_connect_timeout 60s;
+        proxy_read_timeout 300s;
+        proxy_send_timeout 60s;
+    }
+
+    location /openai_proxy/ {
+        set $up_api https://api.openai.com;
+        rewrite ^/openai_proxy/(.*)$ $1 break;
+        proxy_pass $up_api;
+        proxy_ssl_server_name on;
+        proxy_set_header Host api.openai.com;
+        proxy_connect_timeout 60s;
+        proxy_read_timeout 300s;
+        proxy_send_timeout 60s;
+    }
+
+    location /siliconflow_proxy/ {
+        set $up_api https://api.siliconflow.cn;
+        rewrite ^/siliconflow_proxy/(.*)$ $1 break;
+        proxy_pass $up_api;
+        proxy_ssl_server_name on;
+        proxy_set_header Host api.siliconflow.cn;
+        proxy_connect_timeout 60s;
+        proxy_read_timeout 300s;
+        proxy_send_timeout 60s;
+    }
+
+    location /anthropic_proxy/ {
+        set $up_api https://api.anthropic.com;
+        rewrite ^/anthropic_proxy/(.*)$ $1 break;
+        proxy_pass $up_api;
+        proxy_ssl_server_name on;
+        proxy_set_header Host api.anthropic.com;
+        proxy_connect_timeout 60s;
+        proxy_read_timeout 300s;
+        proxy_send_timeout 60s;
+    }
+
+    # 代理/live/开头的路径 (ZLMediaKit 流媒体)
+    location ^~ /live/ {
+        proxy_pass http://polaris-media:8081;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        
+        # WebSocket支持配置
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        
+        proxy_connect_timeout 60s;
+        proxy_read_timeout 3600s;
+        proxy_send_timeout 60s;
+    }
+
     # 仅允许代理/rtp/开头的路径
     location ^~ /rtp/ {
         # 代理到ZLMediakit服务
-        proxy_pass http://polaris-media:80;
+        proxy_pass http://polaris-media:8081;
         
         # 基础HTTP代理配置
         proxy_set_header Host $host;
@@ -88,7 +194,7 @@ server {
     # 仅允许代理/rtp/开头的路径
     location ^~ /mp4_record/ {
         # 代理到ZLMediakit服务
-        proxy_pass http://polaris-media:80;
+        proxy_pass http://polaris-media:8081;
         
         # 基础HTTP代理配置
         proxy_set_header Host $host;
@@ -105,6 +211,14 @@ server {
         proxy_connect_timeout 60s;
         proxy_read_timeout 3600s;
         proxy_send_timeout 60s;
+    }
+
+    # 巡检媒体静态服务（local 存储）：由 nginx 直接吐文件，不经 Tomcat，省内存更快
+    location ^~ /patrol-media/ {
+        alias /opt/patrol-media/;
+        expires 7d;
+        add_header Cache-Control "public";
+        access_log off;
     }
 
     error_page   500 502 503 504  /50x.html;

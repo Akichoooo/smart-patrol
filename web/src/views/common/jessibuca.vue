@@ -238,9 +238,24 @@ export default {
       this.performance = ''
     },
     screenshot: function() {
-      if (jessibucaPlayer[this._uid]) {
-        jessibucaPlayer[this._uid].screenshot()
+      try {
+        const canvas = this.getVideoElement()
+        if (canvas && canvas.width > 0 && canvas.height > 0) {
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.85)
+          if (dataUrl && dataUrl.length > 200) {
+            return dataUrl
+          }
+        }
+      } catch (e) {
+        console.warn('Jessibuca canvas toDataURL error', e)
       }
+      if (jessibucaPlayer[this._uid]) {
+        try {
+          const res = jessibucaPlayer[this._uid].screenshot('snap', 'base64')
+          if (res) return res
+        } catch (e) {}
+      }
+      return null
     },
     mute: function() {
       if (jessibucaPlayer[this._uid]) {

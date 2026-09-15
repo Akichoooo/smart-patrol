@@ -73,6 +73,39 @@ export const constantRoutes = [
     }]
   },
   {
+    path: '/ai',
+    component: Layout,
+    redirect: '/ai/monitor',
+    name: 'AiInspection',
+    meta: { title: '智能巡检', icon: 'el-icon-video-camera' },
+    children: [
+      {
+        path: 'monitor',
+        name: 'AiMonitor',
+        component: () => import('@/views/ai/monitor/index'),
+        meta: { title: '巡检监控台', icon: 'el-icon-view' }
+      },
+      {
+        path: 'models',
+        name: 'AiModels',
+        component: () => import('@/views/ai/models/index'),
+        meta: { title: '算法模型配置', icon: 'el-icon-cpu' }
+      },
+      {
+        path: 'tasks',
+        name: 'AiTasks',
+        component: () => import('@/views/ai/tasks/index'),
+        meta: { title: '巡检任务编排', icon: 'el-icon-s-operation' }
+      },
+      {
+        path: 'alarms',
+        name: 'AiAlarms',
+        component: () => import('@/views/ai/alarms/index'),
+        meta: { title: '告警处置中心', icon: 'el-icon-warning-outline' }
+      }
+    ]
+  },
+  {
     path: '/channel',
     component: Layout,
     redirect: '/channel',

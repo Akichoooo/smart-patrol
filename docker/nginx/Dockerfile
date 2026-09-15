@@ -1,28 +1,10 @@
-FROM ubuntu:24.04 AS builder
-
-
-RUN apt-get update && \
-    apt-get install -y nodejs npm  && \
-    rm -rf /var/lib/apt/lists/*
-
-COPY ./web /build
-WORKDIR /build
-
-RUN npm --registry=https://registry.npmmirror.com install
-RUN npm run build:prod
-
-WORKDIR /src/main/resources
-RUN ls
-
-WORKDIR /src/main/resources/static
-RUN ls
-
+# 前端镜像：直接使用本机 npm run build 产物（src/main/resources/static）
+# 产物由 web-react/vite.config.ts 的 outDir '../src/main/resources/static' 生成
+# 本机构建命令：cd web-react && NODE_OPTIONS=--max-old-space-size=2048 npm run build
 FROM nginx:alpine
 
 ARG TZ=Asia/Shanghai
 
-
-COPY --from=builder /src/main/resources/static /opt/dist
+COPY ./src/main/resources/static /opt/dist
 
 CMD ["nginx","-g","daemon off;"]
-

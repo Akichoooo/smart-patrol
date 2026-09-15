@@ -2,6 +2,7 @@ package com.genersoft.iot.vmp.conf.security;
 
 import com.genersoft.iot.vmp.conf.UserSetting;
 import com.genersoft.iot.vmp.conf.security.dto.JwtUser;
+import com.genersoft.iot.vmp.patrol.security.PatrolAuthorityService;
 import com.genersoft.iot.vmp.service.IUserService;
 import com.genersoft.iot.vmp.storager.dao.dto.Role;
 import com.genersoft.iot.vmp.storager.dao.dto.User;
@@ -13,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -20,11 +22,16 @@ import org.springframework.web.util.ContentCachingRequestWrapper;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * jwt token 过滤器
+ * <p>
+ * 巡检平台改造（滑动续签 + RBAC 权限装配）：
+ * 1. EXPIRING_SOON 时签发新 token 写入响应头 access-token（前端拦截器自动续期），
+ *    为避免每请求都签发，剩余时间 < 有效期50% 时才续签（EXPIRING_SOON 判定已覆盖该窗口）。
+ * 2. SecurityContext 的 authorities 从 patrol_role_permission 聚合，admin 全权限兜底。
  */
-
 @Slf4j
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -37,6 +44,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
     private IUserService userService;
+
+    @Autowired(required = false)
+    private PatrolAuthorityService patrolAuthorityService;
 
 
     @Override
@@ -86,7 +96,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         JwtUser jwtUser = JwtUtils.verifyToken(jwt);
         String username = jwtUser.getUserName();
-        // TODO 处理各个状态
         switch (jwtUser.getStatus()){
             case EXPIRED:
                 response.setStatus(401);
@@ -99,8 +108,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 chain.doFilter(request, response);
                 return;
             case EXPIRING_SOON:
-                // 即将过期
-//                return;
+                // 滑动续签：下发新 token 到响应头，前端拦截器读取后更新本地 token。
+                // 本请求继续用旧 token 完成（旧 token 在有效期内仍可验证），后续请求使用新 token。
+                try {
+                    String renewed = JwtUtils.createToken(username);
+                    if (renewed != null) {
+                        response.setHeader(JwtUtils.getHeader(), renewed);
+                    }
+                } catch (Exception e) {
+                    log.warn("[Token续签] 签发失败: {}", e.getMessage());
+                }
+                break;
             default:
         }
         // 构建UsernamePasswordAuthenticationToken,这里密码为null，是因为提供了正确的JWT,实现自动登录
@@ -125,8 +143,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
 
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(user, jwtUser.getPassword(), new ArrayList<>() );
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(user, jwtUser.getPassword(), loadAuthorities(user.getRole().getId()) );
         SecurityContextHolder.getContext().setAuthentication(token);
         chain.doFilter(request, response);
+    }
+
+    /** 巡检平台 RBAC：聚合角色权限；未启用 patrol 模块时退化为空列表（兼容原行为） */
+    private List<GrantedAuthority> loadAuthorities(int roleId) {
+        if (patrolAuthorityService != null) {
+            try {
+                return patrolAuthorityService.loadAuthorities(roleId);
+            } catch (Exception e) {
+                log.warn("[Patrol权限] 聚合角色{}权限失败: {}", roleId, e.getMessage());
+            }
+        }
+        return new ArrayList<>();
     }
 }

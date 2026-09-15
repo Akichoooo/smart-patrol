@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.*;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface CloudRecordServiceMapper {
@@ -169,4 +170,19 @@ public interface CloudRecordServiceMapper {
             " <if test= 'callId != null '> and call_id=#{callId}</if>" +
             " </script>")
     List<CloudRecordItem> queryRecordByAppStreamAndCallId(String app, String stream, String callId);
+
+    // ---------------- 录像对账（patrol CloudRecordReconciler 使用） ----------------
+
+    /** 近某日已有记录的 app/stream 组合（对账枚举磁盘目录的驱动来源） */
+    @Select("select app, stream from wvp_cloud_record " +
+            "where end_time >= #{startTimeStamp} and start_time <= #{endTimeStamp} " +
+            "group by app, stream")
+    List<Map<String, Object>> getCombosOfPeriod(@Param("startTimeStamp") Long startTimeStamp,
+                                                @Param("endTimeStamp") Long endTimeStamp);
+
+    /** 同节点同流下是否已存在同名文件（孤儿判定：存在即跳过） */
+    @Select("select count(*) from wvp_cloud_record " +
+            "where media_server_id = #{mediaServerId} and app = #{app} and stream = #{stream} and file_name = #{fileName}")
+    int existsByFileName(@Param("mediaServerId") String mediaServerId, @Param("app") String app,
+                         @Param("stream") String stream, @Param("fileName") String fileName);
 }

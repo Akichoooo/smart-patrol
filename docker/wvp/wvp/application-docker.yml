@@ -1,4 +1,8 @@
 spring:
+    # JDK21 虚拟线程：每请求一线程，抓帧/轮询等短阻塞不再占用平台线程（架构规范 §6）
+    threads:
+        virtual:
+            enabled: true
     cache:
         type: redis
     thymeleaf:
@@ -83,7 +87,7 @@ media:
   id: polaris
   # [必须修改] ZLM 内网IP与端口
   ip: ${ZLM_HOST:127.0.0.1}
-  http-port: 80
+  http-port: ${MediaHttp:8081}
   # [可选] 返回流地址时的ip，置空使用 media.ip
   stream-ip: ${Stream_IP}
   # [可选] wvp在国标信令中使用的ip，此ip为摄像机可以访问到的ip， 置空使用 media.ip
@@ -131,12 +135,41 @@ user-settings:
     interface-authentication-excludes:
     #  - /api/**
     push-authority: true
+    # 登录有效期（单位：分钟）——已实现滑动续签：持续操作不掉线，空闲超时自动跳登录
+    login-timeout: 5
     # allowed-origins:
     #   - http://localhost:8080
     #   - http://127.0.0.1:8080
     #   - http://0.0.0.0:8080
     #   - ${NGINX_HOST}
     jwkFile: classpath:xxxxxxxxxxx.json
+
+# 智能巡检平台（patrol 模块）配置
+patrol:
+    inference:
+        # 本地 YOLO 推理服务（容器内地址，不写死 127.0.0.1）
+        yolo-url: ${YOLO_URL:http://yolo-service:8999}
+    vlm:
+        # 云端 VLM 保底策略（对齐 OpenAI/LiteLLM/Resilience4j 成熟实践）
+        max-retry: 5               # 最多重试次数（指数退避±30%抖动，遵守 Retry-After）
+        timeout-ms: 90000          # 单次请求读超时
+        min-interval-ms: 2000      # 客户端主动限流：两次调用最小间隔
+        max-concurrent: 1          # 最大并发（单 Key 场景串行最稳）
+        circuit-threshold: 5       # 连续限流 N 次触发熔断
+        circuit-open-ms: 60000     # 熔断冷却时长（冷却后自动放行探测）
+        deadline-ms: 180000        # 单次分析总截止时间（含全部重试）
+    capture:
+        # FIXED_CHANNEL 模式 WVP 截图超时
+        timeout-ms: 15000
+    media:
+        # 媒体存储：local(本地磁盘,nginx静态服务) / s3 / ftp（后两者未实现，见 DESIGN.md）
+        storage: ${PATROL_MEDIA_STORAGE:local}
+        upload-dir: /opt/wvp/media/patrol
+        url-prefix: /patrol-media
+    aes:
+        # VLM api_key_enc 加密密钥（生产请通过环境变量覆盖）
+        key: ${PATROL_AES_KEY:wvp-patrol-2026-aes}
+
 logging:
   config: classpath:logback-spring.xml
 

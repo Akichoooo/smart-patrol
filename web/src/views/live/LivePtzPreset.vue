@@ -26,11 +26,15 @@ export default {
     getPresetList() {
       this.$store.dispatch('commonChanel/queryPreset', this.channelId)
         .then(data => {
-          this.presetList = data
+          this.presetList = data || []
+        })
+        .catch(() => {
+          this.presetList = []
         })
     },
     gotoPreset(preset) {
       this.$store.dispatch('commonChanel/callPreset', { channelId: this.channelId, presetId: preset.presetId })
+        .catch(() => {})
     }
   }
 }

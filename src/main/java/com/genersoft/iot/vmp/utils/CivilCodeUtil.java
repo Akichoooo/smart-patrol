@@ -66,8 +66,11 @@ public enum CivilCodeUtil {
 
     public List<CivilCodePo> getAllParentCode(String civilCode) {
         List<CivilCodePo> civilCodePoList = new ArrayList<>();
+        if (civilCode == null) {
+            return civilCodePoList;
+        }
         CivilCodePo parentCode = getParentCode(civilCode);
-        if (parentCode != null) {
+        if (parentCode != null && parentCode.getCode() != null) {
             civilCodePoList.add(parentCode);
             List<CivilCodePo> allParentCode = getAllParentCode(parentCode.getCode());
             if (!allParentCode.isEmpty()) {
